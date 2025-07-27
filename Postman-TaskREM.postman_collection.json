@@ -1,0 +1,370 @@
+{
+	"info": {
+		"_postman_id": "afe23884-e733-46f2-b1e2-f8af42992050",
+		"name": "Postman-TaskREM",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13154035"
+	},
+	"item": [
+		{
+			"name": "Register",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let jsonData = pm.response.json();  \r",
+							"let statusCode = pm.response.code;\r",
+							"\r",
+							"\r",
+							"if (statusCode === 201) {\r",
+							"    pm.test(\"Status code is 201 & Item is Created\", function () {\r",
+							"        pm.response.to.have.status(201);\r",
+							"    });\r",
+							"}\r",
+							"\r",
+							"\r",
+							"else if (statusCode === 400) {\r",
+							"    pm.test(\"Status code is 400\", function () {\r",
+							"        pm.response.to.have.status(400);\r",
+							"    });\r",
+							"\r",
+							"    pm.test(\"Error message says user already exists\", function () {\r",
+							"        pm.expect(jsonData.error).to.eql(\"المستخدم موجود بالفعل\");\r",
+							"    });\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"Mekki Hassan2\",\r\n    \"password\":\"123456\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/auth/register",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let jsonData = pm.response.json();\r",
+							"let statusCode = pm.response.code;\r",
+							"\r",
+							"if (statusCode === 200) {\r",
+							"    pm.test(\"Status code is 200\", function () {\r",
+							"        pm.response.to.have.status(200);\r",
+							"    });\r",
+							"\r",
+							"    pm.test(\"Login success message is correct: تم تسجيل الدخول بنجاح\", function () {\r",
+							"        pm.expect(jsonData.message).to.eql(\"تم تسجيل الدخول بنجاح\");\r",
+							"    });\r",
+							"} \r",
+							"else if (statusCode === 401) {\r",
+							"    pm.test(\"Status code is 401\", function () {\r",
+							"        pm.response.to.have.status(401);\r",
+							"    });\r",
+							"\r",
+							"    pm.test(\"Error message says: بيانات الدخول غير صحيحة\", function () {\r",
+							"        pm.expect(jsonData.error).to.eql(\"بيانات الدخول غير صحيحة\");\r",
+							"    });\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\":\"Mekki Hassan\",\r\n    \"password\":\"123456\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/auth/login",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AllTasks",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let responseBody = pm.response.json();\r",
+							"let statusCode = pm.response.code;\r",
+							"\r",
+							"if (statusCode === 200) {\r",
+							"    pm.test(\"Status code is 200\", function () {\r",
+							"        pm.response.to.have.status(200);\r",
+							"    });\r",
+							"\r",
+							"    pm.test(\"Response contains list of todos\", function () {\r",
+							"        pm.expect(responseBody).to.be.an(\"array\");\r",
+							"    });\r",
+							"}\r",
+							"\r",
+							"else if (statusCode === 400) {\r",
+							"    pm.test(\"Status code is 400\", function () {\r",
+							"        pm.response.to.have.status(400);\r",
+							"    });\r",
+							"\r",
+							"    pm.test(\"Error message موجود\", function () {\r",
+							"        pm.expect(responseBody.error).to.exist;\r",
+							"    });\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/todos",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"todos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateTask",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let requestRightData = {\r",
+							"    title: \"hello worled\",\r",
+							"    completed: false\r",
+							"};\r",
+							"\r",
+							"let requestWrongData = {\r",
+							"    title: \"hello\",\r",
+							"    completed: false\r",
+							"};\r",
+							"pm.environment.set(\"requestRightData\", JSON.stringify(requestRightData));\r",
+							"pm.environment.set(\"requestWrongData\", JSON.stringify(requestWrongData));"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let jsonData = pm.response.json();\r",
+							"\r",
+							"// Save the title of task and check if it exists or not\r",
+							"let sentRightData = JSON.parse(pm.environment.get(\"requestRightData\"));\r",
+							"\r",
+							"pm.test(\"Title in response matches request\", function () {\r",
+							"    pm.expect(jsonData.title).to.eql(sentRightData.title);\r",
+							"});\r",
+							"\r",
+							"// CHECK AGAINST THE WRONG DATA\r",
+							"let sentWrongData = JSON.parse(pm.environment.get(\"requestWrongData\"));\r",
+							"\r",
+							"pm.test(\"Title in response does NOT match wrong data\", function () {\r",
+							"    pm.expect(jsonData.title).to.not.eql(sentWrongData.title);\r",
+							"});\r",
+							" \r",
+							" //save a title task to seaech on it in the next request\r",
+							"pm.environment.set(\"taskTitle\", jsonData.title);\r",
+							" //save a title task to seaech on it in the next request\r",
+							"pm.environment.set(\"taskID\", jsonData.id);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"hello worled\",\r\n    \"completed\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/todos",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"todos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdatTask",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let jsonData = pm.response.json();\r",
+							"let title = jsonData.title;\r",
+							"let titleBeforeUpdate = pm.environment.get(\"taskTitle\");\r",
+							"\r",
+							"pm.test(\"The title is updated successfully\", function () {\r",
+							"    pm.expect(title).not.eql(titleBeforeUpdate); \r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"Hello REM Company\",\r\n    \"completed\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5001/todos/{{taskID}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"todos",
+						"{{taskID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteTask",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204 and the task is deleted\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5001/todos/{{taskID}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5001",
+					"path": [
+						"todos",
+						"{{taskID}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "http://localhost:5001",
+			"type": "default"
+		}
+	]
+}
